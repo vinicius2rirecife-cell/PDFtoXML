@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>PDF para XML Asgard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fb; color: #222; }
+    .wrap { max-width: 900px; margin: 40px auto; background: #fff; padding: 28px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+    h1 { margin-top: 0; }
+    .muted { color: #666; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; }
+    input, select { width: 100%; padding: 12px; border: 1px solid #d8deea; border-radius: 10px; box-sizing: border-box; }
+    .full { grid-column: 1 / -1; }
+    .btn { margin-top: 20px; background: #1f5eff; color: #fff; border: 0; padding: 14px 18px; border-radius: 10px; cursor: pointer; font-weight: 700; }
+    .flash { background: #fff3cd; color: #6a5600; padding: 12px; border-radius: 10px; margin-bottom: 16px; }
+    .tips { margin-top: 24px; background: #eef4ff; padding: 16px; border-radius: 12px; }
+    code { background: #eef1f6; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Gerador de XML para Asgard</h1>
+    <p class="muted">Envie um PDF com texto, escolha o tipo e baixe um XML no padrão base. Para PDF escaneado por imagem, será necessário OCR depois.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="flash">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="/gerar-xml" method="post" enctype="multipart/form-data">
+      <div class="grid">
+        <div class="full">
+          <label for="pdf_file">PDF</label>
+          <input id="pdf_file" name="pdf_file" type="file" accept=".pdf" required>
+        </div>
+
+        <div>
+          <label for="template_type">Modelo XML</label>
+          <select id="template_type" name="template_type">
+            <option value="compra_financiamento">Compra + Financiamento</option>
+            <option value="compra_simples">Compra Simples</option>
+            <option value="alienacao_fiduciaria">Alienação Fiduciária</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="local">Local</label>
+          <input id="local" name="local" type="text" value="RECIFE/PE">
+        </div>
+
+        <div>
+          <label for="numero_contrato">Número do contrato (opcional)</label>
+          <input id="numero_contrato" name="numero_contrato" type="text" placeholder="Se o parser não achar, informe aqui">
+        </div>
+
+        <div>
+          <label for="data_instrumento">Data do instrumento (opcional)</label>
+          <input id="data_instrumento" name="data_instrumento" type="text" placeholder="dd/mm/aaaa">
+        </div>
+      </div>
+
+      <button class="btn" type="submit">Gerar XML</button>
+    </form>
+
+    <div class="tips">
+      <strong>Campos que o sistema tenta achar no PDF:</strong>
+      <p class="muted">
+        comprador, vendedor, CPF/CNPJ, matrícula, valores, banco, data, número do contrato,
+        prazo, juros e primeira parcela.
+      </p>
+      <p class="muted">
+        Se o PDF tiver outro layout, ajuste os padrões em <code>src/extractor.py</code>.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
